@@ -39,3 +39,12 @@ func dayView(dayMenu domain.DayMenu) fyne.CanvasObject {
 	view := widget.NewCard(dayMenu.Date.Format("Monday"), dayMenu.Date.Format("02.01.2006"), c)
 	return view
 }
+
+func menuView(menu domain.Menu) fyne.CanvasObject {
+	box := container.NewVBox()
+	for _, dayMenu := range menu {
+		box.Add(dayView(dayMenu))
+	}
+	scrollContent := container.NewScroll(box)
+	return scrollContent
+}

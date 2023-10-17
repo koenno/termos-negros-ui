@@ -1,6 +1,8 @@
 package app
 
 import (
+	"fmt"
+
 	"fyne.io/fyne/v2"
 	fyneapp "fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
@@ -11,43 +13,46 @@ import (
 type App struct {
 	gui        fyne.App
 	mainWindow fyne.Window
+	data       domain.Menu
 }
 
-func New() App {
+func New() *App {
 	gui := fyneapp.New()
 	mainWindow := gui.NewWindow("Menu")
-	return App{
+	return &App{
 		gui:        gui,
 		mainWindow: mainWindow,
 	}
 }
 
-func (a App) ShowMenu(dataPipe <-chan domain.DayMenu) {
+func (a *App) SetData(data domain.Menu) {
+	a.data = data
+}
+
+func (a *App) ShowMenu(menu domain.Menu) {
 	// progress := widget.NewProgressBarInfinite()
 	// // progress.Resize(fyne.NewSize(20.0, 5.0))
 	// content := container.New(layout.NewCenterLayout(), progress)
 	// a.mainWindow.SetContent(content)
 
-	box := container.NewVBox()
-	menu := container.NewAdaptiveGrid(1, box)
-	menu.Resize(fyne.NewSize(400.0, 600.0))
-	for data := range dataPipe {
-		box.Add(dayView(data))
-	}
+	filterButton := widget.NewButton("hide outdated", func() { fmt.Println("tapped text button") })
+	buttonsContainer := container.NewVBox(filterButton)
 
-	scrollContent := container.NewScroll(menu)
+	dataView := menuView(menu)
 
-	a.mainWindow.SetContent(scrollContent)
+	mainBox := container.NewBorder(nil, buttonsContainer, nil, nil, dataView)
+
+	a.mainWindow.SetContent(mainBox)
 	a.mainWindow.SetFullScreen(false)
 	a.mainWindow.Resize(fyne.NewSize(400.0, 600.0))
 }
 
-func (a App) ShowError(err error) {
+func (a *App) ShowError(err error) {
 	content := widget.NewTextGridFromString(err.Error())
 	a.mainWindow.SetContent(content)
 }
 
-func (a App) Run() {
+func (a *App) Run() {
 	a.mainWindow.Show()
 	a.gui.Run()
 }
