@@ -13,7 +13,8 @@ func main() {
 	if err != nil {
 		theApp.ShowError(err)
 	} else {
-		theApp.ShowMenu(d)
+		theApp.SetData(d)
+		theApp.ShowData()
 	}
 
 	theApp.Run()
